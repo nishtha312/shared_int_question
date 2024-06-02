@@ -1,0 +1,52 @@
+i/p
+a,b
+1,address
+2,THE country
+3,StAte
+
+o/p
+a,b
+1,Address
+2,Thecountry
+3,State
+
+df = df.withColumn("new_b", b.replace(" ", "")).concat(substr(col("b"),1,2).upper(), substr(col("b"),2))
+
+i/p
+address,THE country,StAte
+pune,India,MH
+
+o/p
+Address,Thecountry,State
+pune,India,MH
+
+.split(",")
+old_col_list = ['address','THE country','StAte']
+new_col_list = []
+
+for i in old_col_list:
+	i.replace(" ", "")
+	new_col_list.append(i[0].uppercase() + i[1:])
+	
+	
+col1 col2 col3 col4 col5
+01 Aditya AP  IPOD 30000
+01 Aditya AP  LAPTOP 50000
+01 Aditya AP MOBILE 20000
+02  MIKE US  BASE_BALL_STICK 10000
+02 MIKE US GOLF_KIT 5000
+02 MIKE US BOOKS 200
+
+col1 col2 col3 new_col4 new_col5
+01 Aditya AP IPOD|LAPTOP|MOBILE 100000
+
+select * from
+(select col1, col2, col3, LIST_AGG(col4, '|') WITHIN GROUP (ORDER BY col1) as new_col4
+group by col1) a,
+
+(select col1, col2, col3, sum(col5) as new_col5
+group by col1, col2, col3) b
+
+on a.col1=b.col1 and
+a.col2=b.col2 and
+a.col3=b.col3

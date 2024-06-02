@@ -1,0 +1,100 @@
+2. Write a sql to list all customer ids who purchased alexa and kindle both but didn’t purchase notebook.
+table:
+ORDER_ID | CUSTOMER_ID | ORDER_DATE  |  PRODUCT  | ORDER_AMOUNT
+--------------------------------------------------------------
+   1     |    202      | 2014-02-12  |   alexa   |     100
+   2     |    202      | 2014-02-12  |  kindle   |     200
+   4     |    203      | 2014-07-10  |  kindle   |     200
+   5     |    203      | 2014-07-10  |   alexa   |     100
+   6     |    203      | 2015-03-05  | notebook  |     300
+   7     |    204      | 2015-03-05  |   alexa   |     100
+   8     |    205      | 2015-03-05  |  kindle   |     200
+   
+select distinct T1.CUSTOMER_ID from (select * from table where CUSTOMER_ID not in (select CUSTOMER_ID from table where PRODUCT='notebook')) T1 inner join table T2
+on T1.CUSTOMER_ID=T2.CUSTOMER_ID and T1.PRODUCT='alexa' and T2.PRODUCT='kindle';
+
+T1:
+ORDER_ID | CUSTOMER_ID | ORDER_DATE  |  PRODUCT  | ORDER_AMOUNT
+--------------------------------------------------------------
+   1     |    202      | 2014-02-12  |   alexa   |     100
+   2     |    202      | 2014-02-12  |  kindle   |     200
+   7     |    204      | 2015-03-05  |   alexa   |     100
+   8     |    205      | 2015-03-05  |  kindle   |     200
+
+T2:
+ORDER_ID | CUSTOMER_ID | ORDER_DATE  |  PRODUCT  | ORDER_AMOUNT
+--------------------------------------------------------------
+   1     |    202      | 2014-02-12  |   alexa   |     100
+   2     |    202      | 2014-02-12  |  kindle   |     200
+   4     |    203      | 2014-07-10  |  kindle   |     200
+   5     |    203      | 2014-07-10  |   alexa   |     100
+   6     |    203      | 2015-03-05  | notebook  |     300
+   7     |    204      | 2015-03-05  |   alexa   |     100
+   8     |    205      | 2015-03-05  |  kindle   |     200
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+select records with latest higher tier
+latest will be max(Date)
+higher tier will be like: premium+ > premium > free
+ID Tier TimelineDate
+101 free 01/01/2015
+101 premium 07/01/2017
+101 premium+ 12/11/2021
+102 free 23/03/2019
+102 premium 12/12/2022
+
+
+with cte as(
+select case when Tier='premium +' then 1 
+when Tier='premium' then 2 else 3 end as Tier_number, * from table)
+select * from (select *, row_number() over(partition by id order by Tier_number, TimelineDate desc) as rn from cte ) where rn=1
+
+
+
+
+
+
+4. There is a json file with following content :- { “dept_id”:101,”e_id”:[10101,10102,10103]} { “dept_id”:102,”e_id”:[10201,10202]} 
+
+And data is loaded into spark dataframe say mydf, having below dtypes dept_id: bigint, e_id: array<bigint> 
+ 
+What will be the best way to get the e_id individually with dept_id ?
+
+df = spark.read.json("file.json")
+mydf = df.explode()
+
+transformation:- narrow range dependency, wide range dependency
+
+optimize spark:-
+repartion, partitioning, coalesce, broadcast join
+
+airflow:
+
+s3 --aws (operator? file bucket trigger)
+DAG1(task1 task2 task3) DAG2(task1 task2)
+operator to trigger DAG1(task2) -> DAG1(task2)
+
+
+find max and min salary dept wise using Pyspark
+
+max_df = df.groupBy("dept_id").agg({'salary': max})
+min_df = df.groupBy("dept_id").agg({'salary': min})
+
+max_df = df.groupBy("dept_id").max(df['salary'])
+min_df = df.groupBy("dept_id").min(df['salary'])
+
+window = Window.partitionBy("dept_id").orderBy("salary", ascending=False)
+df = df.(row_number() over(window)).filter(rn=1)
+
+[17:50] Chinmay Dhamane (Unverified)
+df.groupBy("department").agg ( min("salary").alias("min_salary"), max("salary").alias(“max_salary") )

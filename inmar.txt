@@ -1,0 +1,167 @@
+Please write Spark code to load a table "order" from Mysql DB to Spark data frame:
+df = spark.read.csv("/csv_path", header='true', inferSchema='true')
+
+Write spark code to show April 2024 orders
+april_df = df.filter(df["purchase_date"]>='2024-04-01' and df["purchase_date"]<'2024-05-01').show()
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions._
+
+val spark = SparkSession.builder()
+  .appName("April 2024 Orders")
+  .getOrCreate()
+
+import spark.implicits._
+
+// Sample orders data
+val ordersData = Seq(
+  (101, "2024-04-06"),
+  (102, "2024-04-15"),
+  (103, "2024-04-20"),
+  (104, "2024-03-15"),
+  (105, "2024-04-25")
+)
+
+val ordersDF = ordersData.toDF("order_id", "order_date")
+
+// Filter orders placed in April 2024
+val aprilOrdersDF = ordersDF.filter(month(col("order_date")) === 4 && year(col("order_date")) === 2024)
+
+// Show the result
+aprilOrdersDF.show()
+
+
+Write spark code to show order purchased by new customers in April 2024 (customers who did not purchase before April 2024)
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions._
+
+val spark = SparkSession.builder()
+  .appName("Orders by New Customers in April 2024")
+  .getOrCreate()
+
+import spark.implicits._
+
+// Sample customers data
+val customersData = Seq(
+  (1, "Alice", "2024-03-15"),
+  (2, "Bob", "2024-04-05"),
+  (3, "Charlie", "2024-04-10"),
+  (4, "David", "2023-12-25")
+)
+
+val customersDF = customersData.toDF("customer_id", "name", "signup_date")
+
+// Sample orders data
+val ordersData = Seq(
+  (101, 2, "2024-04-06"),
+  (102, 3, "2024-04-15"),
+  (103, 1, "2024-04-20"),
+  (104, 4, "2024-03-15")
+)
+
+val ordersDF = ordersData.toDF("order_id", "customer_id", "order_date")
+
+// Filter new customers who signed up in April 2024
+val newCustomersDF = customersDF.filter(month(col("signup_date")) === 4 && year(col("signup_date")) === 2024)
+
+// Filter orders placed in April 2024
+val aprilOrdersDF = ordersDF.filter(month(col("order_date")) === 4 && year(col("order_date")) === 2024)
+
+// Join the DataFrames to get orders by new customers in April 2024
+val ordersByNewCustomersDF = aprilOrdersDF.join(newCustomersDF, "customer_id")
+
+// Show the result
+ordersByNewCustomersDF.show()
+
+
+old_cust_df = df.filter(df["purchase_date"]<'2024-04-01').select("customer_id")
+
+new_cust_df = april_df.join(old_cust_df , april_df["customer_id"]==old_cust_df["customer_id"], left).filter(old_cust_df["customer_id"] is null).show()
+
+april_df        old_cust_df 
+1				1           
+2				2           
+3(new)			null       
+-----------------------------------------------------------------------------------------------
+
+Create a data frame only contains customer's most recent order
+
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.expressions.Window
+import org.apache.spark.sql.functions._
+
+val spark = SparkSession.builder()
+  .appName("Customer's Most Recent Order")
+  .getOrCreate()
+
+import spark.implicits._
+
+// Sample orders data
+val ordersData = Seq(
+  (1, 101, "2024-04-06"),
+  (2, 102, "2024-04-15"),
+  (1, 103, "2024-04-20"),
+  (3, 104, "2024-03-15"),
+  (2, 105, "2024-04-25"),
+  (3, 106, "2024-04-18")
+)
+
+val ordersDF = ordersData.toDF("customer_id", "order_id", "order_date")
+
+// Define a window specification
+val windowSpec = Window.partitionBy("customer_id").orderBy(col("order_date").desc)
+
+// Add a rank column to determine the most recent order per customer
+val rankedOrdersDF = ordersDF.withColumn("rank", row_number().over(windowSpec))
+
+// Filter to get only the most recent order for each customer
+val mostRecentOrdersDF = rankedOrdersDF.filter(col("rank") === 1).drop("rank")
+
+// Show the result
+mostRecentOrdersDF.show()
+
+
+window_spec = Window.partitionBy("customer_id").orderBy("purchase_date", desc())
+
+df1 = df.withColumn("RN", row_number().over(window_spec ))
+
+df2 = df1.filter(df1["RN"]==1).show()
+-----------------------------------------------------------------------------------------------
+
+how to load into spark using BQ
+
+import org.apache.spark.sql.SparkSession
+
+val spark = SparkSession.builder()
+  .appName("Load Data from BigQuery")
+  .config("spark.jars.packages", "com.google.cloud.spark:spark-bigquery-with-dependencies_2.12:0.29.0")
+  .getOrCreate()
+
+// Set the environment variable for Google Cloud authentication
+sys.env("GOOGLE_APPLICATION_CREDENTIALS") = "/path/to/your-service-account-file.json"
+
+import org.apache.spark.sql.functions._
+
+val projectId = "your-gcp-project-id"
+val dataset = "your_bigquery_dataset"
+val table = "your_bigquery_table"
+
+// Load data from BigQuery into a DataFrame
+val df = spark.read.format("bigquery")
+  .option("project", projectId)
+  .option("dataset", dataset)
+  .option("table", table)
+  .load()
+
+// Show the DataFrame schema and some rows
+df.printSchema()
+df.show()
+ BIgquery connector
+
+df = bq.client("""select * from """)
+
+review comments: left gcs.(overwritetable) load avro , right side bigquery.loadtableGBQ()
+cost effecient
+
+type partitioning
+
+max partitions

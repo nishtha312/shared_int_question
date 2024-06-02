@@ -1,0 +1,32 @@
+explain partioning and clustering in BQ?
+
+optimizing techniques in BQ:- 
+partioning and clustering
+authorized & materialized views
+using where filter
+use cache results for repeated query
+use materialized views for frequently used queries
+use CTE/Joins, avoid subqueries as they are resource intensive
+
+Q. schemas in DWH?
+star & snowflake schema
+star schema: simple 1 FT connected with multiple DT (1:m relationship), less DT tables more denormalized
+snowflake schema: extension of star schema, complex, more sub-DT more normalization
+
+Q. how to select 100 columns except column 50 in big query?
+select * except col50 from table
+
+String: '123456789'
+Transform into '12345-67-89'
+select concat(substr(String, 1,5), '-', substr(String, 6,2), '-', substr(String, 8,2));
+rd[0:5]+'-'+rd[5:7]+'-'+rd[7:9]
+
+how to remove duplicates from pandas df?
+df.drop_duplicates()
+
+crom for to schedule job for every 1 hour? 
+0 * * * *
+
+what is lambda function in python?
+x = lambda x : x**2
+
