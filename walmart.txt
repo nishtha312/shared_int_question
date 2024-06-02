@@ -1,0 +1,92 @@
+
+60 nodes 250GB memory per node 
+
+Number of executor 
+Number of core
+Executor memory
+Driver memory 
+
+
+tax_id order_id   row_numb
+
+1 1 nll null
+2 1 1   null
+3 1 1    1
+4 2 1    1
+
+print tax_id,order_id where order_id of 3 consecutive is same
+
+with cte as(
+select tax_id,
+row_number() over(order by order_id) row_number
+from table)
+
+select tax_id,order_id
+from(
+select tax_id,order_id,
+lag(order_id,1) over(order by row_number) rn1
+lag(order_id,2) over(order by row_number) rn2
+from cte) a
+where cte.row_number = table.tax_id
+and a.rn1 = a.rn2
+
+
+find 56
+nums = {12,20,34,56,78,88,98}
+target = 56
+
+for i in nums:
+ if i == taget 
+ retunr true
+ 
+ 
+binary serach
+
+left = 0
+right = len(nums)
+mid = right-left/2
+
+while(mid<right)
+
+
+Id,name,salary,dept_id
+name of employee top 3 unique salary for each department
+
+
+select name,
+max(salary) as max_salry
+from table
+group by department
+
+
+with cte as
+(
+select *,
+dense_rank() over(partition by department order by salary desc) rn
+from table)
+
+select name, distinct salary from cte 
+where rn<=3
+
+
+print delete letter before * 
+vege**tab*le
+output vegtale
+
+j = 0
+for i in range(0,len(s)):
+if s[i] == '*'  and i == 0
+res.append(s[0:i-2])
+elif s[i] == '*" and i != 0 and i!= j
+j = i
+res.append(s[j:i-2])
+
+print(res)
+
+
+
+
+
+
+
+

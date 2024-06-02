@@ -1,0 +1,107 @@
+-- written test total 12 questions 6 Sql, 6 python
+
+
+-- read from csv file and write in parquet file python
+import pandas as pd
+df=pd.read_csv('file path')
+df.to_parquet('output file path')
+
+
+-- read from csv file and write in parquet file spark
+from pyspark.sql import SparkSession
+
+spark = SparkSession \
+    .builder \
+    .appName("Protob Conversion to Parquet") \
+    .config("spark.some.config.option", "some-value") \
+    .getOrCreate()
+
+# read csv
+df = spark.read.csv("/temp/proto_temp.csv")
+
+# Displays the content of the DataFrame to stdout
+df.show()
+
+df.write.parquet("output/proto.parquet")
+
+
+
+--find greater number among 3 number
+
+
+-- reverse a string
+
+palindrome in a string:
+input = "the madam name is rita"
+output = [madam]
+
+input = "the madam name is rita"
+
+def pall(str):
+    return s == s[::-1]
+n=len(str/2)    
+for i in range(0,n):
+    if str[i] != str[n-i]:
+        return false
+return true 
+           
+input = "the madam name is rita"
+
+def pall(s):
+    return s == s[::-1]
+          
+    
+input='the name of madam is riya'
+res=[]
+res=input.split(' ')
+print(res)
+for i in res:
+    str = pall(i)
+    if str == 1:
+        print(i)    
+
+res=[]
+res=input.split(' ')
+print(res)
+for i in res:
+    pall(i)
+
+exchange key value:
+input = {'a':1, 'b':2}
+output = {1:'a', 2:'b'}
+new_dict = dict([(value, key) for key, value in old_dict.items()])
+new_dict = {value:key for key,value in o.items()}
+
+for key, value in old_dict.items():
+   if value in new_dict:
+       new_dict[value].append(key)
+   else:
+       new_dict[value]=[key]
+ 	
+	
+lamda function x*3	
+input = [1,2,3,4]
+output = [1,8,27,64]
+
+res = list(map(lamda x:x*3,nums))
+print(res)
+
+reverse string 
+------------------------------------------SQL
+window function questions
+substr, instr
+
+Question - get first name from email or words before @
+aditya@gmail.com
+aditya
+select substr(name,1,instr(name,@)) from xyz
+
+last name
+first character =a
+3rd character =L
+fetch records
+substr(name,1,1) = a or 
+
+name of all product whose  sales is greater than sales of that product from last month
+month column - [1,2,3,4,5,6,7,8,9] -- month
+sales = 100 200
